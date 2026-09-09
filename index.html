@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Receitas - Spoonacular</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🍴 Receitas</h1>
+        <p>Encontre receitas deliciosas usando a Spoonacular</p>
+    </header>
+
+    <main>
+
+        <section class="pesquisa">
+
+            <input
+                type="text"
+                id="campoPesquisa"
+                placeholder="Digite uma receita...">
+
+            <button id="botaoPesquisar">
+                Pesquisar
+            </button>
+
+        </section>
+
+        <p id="mensagem"></p>
+
+        <section id="resultado" class="receitas"></section>
+
+    </main>
+
+    <script>
+
+        const campoPesquisa = document.getElementById("campoPesquisa");
+        const botaoPesquisar = document.getElementById("botaoPesquisar");
+        const resultado = document.getElementById("resultado");
+        const mensagem = document.getElementById("mensagem");
+
+        async function buscarReceitas() {
+
+            const pesquisa = campoPesquisa.value.trim();
+
+            if (pesquisa === "") {
+                mensagem.textContent = "Digite uma receita para pesquisar.";
+                return;
+            }
+
+            mensagem.textContent = "Buscando receitas...";
+            resultado.innerHTML = "";
+
+            try {
+
+                const resposta = await fetch(
+                    `/receitas?query=${encodeURIComponent(pesquisa)}&number=10`
+                );
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error("Erro ao buscar receitas");
+                }
+
+                mensagem.textContent =
+                    `${dados.results.length} receitas encontradas.`;
+
+                dados.results.forEach(receita => {
+
+                    const card = document.createElement("div");
+
+                    card.classList.add("card");
+
+                    card.innerHTML = `
+                        <img
+                            src="${receita.image}"
+                            alt="${receita.title}"
+                        >
+
+                        <div class="card-conteudo">
+
+                            <h2>${receita.title}</h2>
+
+                            <p>ID da receita: ${receita.id}</p>
+
+                        </div>
+                    `;
+
+                    resultado.appendChild(card);
+
+                });
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                mensagem.textContent =
+                    "Não foi possível buscar as receitas.";
+
+            }
+        }
+
+        botaoPesquisar.addEventListener(
+            "click",
+            buscarReceitas
+        );
+
+        campoPesquisa.addEventListener(
+            "keydown",
+            function(evento) {
+
+                if (evento.key === "Enter") {
+                    buscarReceitas();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
