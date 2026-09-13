@@ -1,5 +1,4 @@
-css
- {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -66,19 +65,10 @@ main {
     background-color: #e85a2a;
 }
 
-#mensagem {
-    margin-bottom: 20px;
-    font-size: 16px;
-}
-
 .receitas {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(250px, 1fr)
-    );
-
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
 }
 
 .card {
@@ -86,17 +76,18 @@ main {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
-    transition: transform 0.2s;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-7px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .card img {
     width: 100%;
-    height: 200px;
+    height: 220px;
     object-fit: cover;
 }
 
@@ -111,4 +102,86 @@ main {
 
 .card-conteudo p {
     color: #777;
+}
+
+.detalhes {
+    display: none;
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.detalhes > img {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 20px auto;
+}
+
+.detalhes h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.informacoes {
+    max-width: 800px;
+    margin: auto;
+}
+
+.informacoes h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #ff6b35;
+}
+
+.informacoes ul {
+    padding-left: 25px;
+}
+
+.informacoes li {
+    margin-bottom: 8px;
+}
+
+#modoPreparo {
+    line-height: 1.8;
+}
+
+.voltar {
+    border: none;
+    background-color: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.voltar:hover {
+    background-color: #555;
+}
+
+@media (max-width: 600px) {
+    .pesquisa {
+        flex-direction: column;
+    }
+
+    .pesquisa button {
+        width: 100%;
+    }
+
+    header h1 {
+        font-size: 30px;
+    }
+
+    .detalhes {
+        padding: 20px;
+    }
+
+    .detalhes > img {
+        height: 250px;
+    }
 }

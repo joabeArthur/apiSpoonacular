@@ -1,130 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Receitas - Spoonacular</title>
-
+    <title>Receitas</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <header>
         <h1>🍴 Receitas</h1>
-        <p>Encontre receitas deliciosas usando a Spoonacular</p>
+        <p>Encontre sua próxima receita favorita</p>
     </header>
 
     <main>
-
         <section class="pesquisa">
-
-            <input
-                type="text"
-                id="campoPesquisa"
-                placeholder="Digite uma receita...">
-
-            <button id="botaoPesquisar">
-                Pesquisar
-            </button>
-
+            <input type="text" id="campoPesquisa" placeholder="Pesquisar receita...">
+            <button id="botaoPesquisar">Pesquisar</button>
         </section>
 
         <p id="mensagem"></p>
 
-        <section id="resultado" class="receitas"></section>
+        <section id="listaReceitas" class="receitas"></section>
 
+        <section id="detalhes" class="detalhes">
+            <button id="botaoVoltar" class="voltar">← Voltar</button>
+
+            <img id="imagemDetalhes" src="" alt="">
+
+            <h1 id="tituloDetalhes"></h1>
+
+            <div class="informacoes">
+                <h2>🥕 Ingredientes</h2>
+                <ul id="ingredientes"></ul>
+
+                <h2>👨‍🍳 Modo de preparo</h2>
+                <div id="modoPreparo"></div>
+            </div>
+        </section>
     </main>
 
     <script>
-
+        const listaReceitas = document.getElementById("listaReceitas");
         const campoPesquisa = document.getElementById("campoPesquisa");
         const botaoPesquisar = document.getElementById("botaoPesquisar");
-        const resultado = document.getElementById("resultado");
         const mensagem = document.getElementById("mensagem");
+        const detalhes = document.getElementById("detalhes");
+        const botaoVoltar = document.getElementById("botaoVoltar");
 
-        async function buscarReceitas() {
-
-            const pesquisa = campoPesquisa.value.trim();
-
-            if (pesquisa === "") {
-                mensagem.textContent = "Digite uma receita para pesquisar.";
-                return;
-            }
-
-            mensagem.textContent = "Buscando receitas...";
-            resultado.innerHTML = "";
+        async function buscarReceitas(pesquisa = "pizza") {
+            mensagem.textContent = "Carregando receitas...";
+            listaReceitas.innerHTML = "";
+            detalhes.style.display = "none";
+            listaReceitas.style.display = "grid";
 
             try {
-
-                const resposta = await fetch(
-                    `/receitas?query=${encodeURIComponent(pesquisa)}&number=10`
-                );
-
-                const dados = await resposta.json();
+                const resposta = await fetch(`/receitas?query=${encodeURIComponent(pesquisa)}&number=12`);
 
                 if (!resposta.ok) {
                     throw new Error("Erro ao buscar receitas");
                 }
 
-                mensagem.textContent =
-                    `${dados.results.length} receitas encontradas.`;
+                const dados = await resposta.json();
+
+                mensagem.textContent = `${dados.results.length} receitas encontradas.`;
 
                 dados.results.forEach(receita => {
-
-                    const card = document.createElement("div");
-
-                    card.classList.add("card");
-
-                    card.innerHTML = `
-                        <img
-                            src="${receita.image}"
-                            alt="${receita.title}"
-                        >
-
-                        <div class="card-conteudo">
-
-                            <h2>${receita.title}</h2>
-
-                            <p>ID da receita: ${receita.id}</p>
-
-                        </div>
-                    `;
-
-                    resultado.appendChild(card);
-
+                    criarCard(receita);
                 });
-
             } catch (erro) {
-
                 console.error(erro);
-
-                mensagem.textContent =
-                    "Não foi possível buscar as receitas.";
-
+                mensagem.textContent = "Não foi possível carregar as receitas.";
             }
         }
 
-        botaoPesquisar.addEventListener(
-            "click",
-            buscarReceitas
-        );
+        function criarCard(receita) {
+            const card = document.createElement("div");
 
-        campoPesquisa.addEventListener(
-            "keydown",
-            function(evento) {
+            card.classList.add("card");
 
-                if (evento.key === "Enter") {
-                    buscarReceitas();
+            card.innerHTML = `
+                <img src="${receita.image}" alt="${receita.title}">
+                <div class="card-conteudo">
+                    <h2>${receita.title}</h2>
+                    <p>Clique para ver a receita</p>
+                </div>
+            `;
+
+            card.addEventListener("click", () => {
+                abrirReceita(receita.id);
+            });
+
+            listaReceitas.appendChild(card);
+        }
+
+        async function abrirReceita(id) {
+            mensagem.textContent = "Carregando receita...";
+            listaReceitas.style.display = "none";
+            detalhes.style.display = "block";
+
+            try {
+                const resposta = await fetch(`/receitas/${id}`);
+
+                if (!resposta.ok) {
+                    throw new Error("Erro ao buscar receita");
                 }
 
+                const receita = await resposta.json();
+
+                mostrarDetalhes(receita);
+
+                mensagem.textContent = "";
+            } catch (erro) {
+                console.error(erro);
+                mensagem.textContent = "Não foi possível carregar a receita.";
             }
-        );
+        }
 
+        function mostrarDetalhes(receita) {
+            document.getElementById("imagemDetalhes").src = receita.image;
+            document.getElementById("imagemDetalhes").alt = receita.title;
+            document.getElementById("tituloDetalhes").textContent = receita.title;
+
+            const listaIngredientes = document.getElementById("ingredientes");
+
+            listaIngredientes.innerHTML = "";
+
+            receita.extendedIngredients.forEach(ingrediente => {
+                const item = document.createElement("li");
+
+                item.textContent = ingrediente.original;
+
+                listaIngredientes.appendChild(item);
+            });
+
+            const modoPreparo = document.getElementById("modoPreparo");
+
+            modoPreparo.innerHTML = receita.instructions || "Modo de preparo não disponível.";
+        }
+
+        botaoVoltar.addEventListener("click", () => {
+            detalhes.style.display = "none";
+            listaReceitas.style.display = "grid";
+            mensagem.textContent = "";
+        });
+
+        botaoPesquisar.addEventListener("click", () => {
+            const pesquisa = campoPesquisa.value.trim();
+
+            if (pesquisa === "") {
+                buscarReceitas("pizza");
+            } else {
+                buscarReceitas(pesquisa);
+            }
+        });
+
+        campoPesquisa.addEventListener("keydown", evento => {
+            if (evento.key === "Enter") {
+                botaoPesquisar.click();
+            }
+        });
+
+        buscarReceitas();
     </script>
-
 </body>
-
 </html>

@@ -1,13 +1,19 @@
 const axios = require("axios");
 
-const traduzir = async (texto, de = "pt", para = "en") => {
+const traduzir = async (texto, de = "en", para = "pt") => {
     try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${de}|${para}`;
+        if (!texto) return "";
+
+        const url = "https://api.mymemory.translated.net/get?q=" +
+            encodeURIComponent(texto) +
+            "&langpair=" + de + "|" + para;
+
         const resposta = await axios.get(url);
-        
+
         if (resposta.data && resposta.data.responseData) {
             return resposta.data.responseData.translatedText;
         }
+
         return texto;
     } catch (erro) {
         console.error("Erro na tradução:", erro.message);
@@ -17,13 +23,7 @@ const traduzir = async (texto, de = "pt", para = "en") => {
 
 const getReceitas = async (req, res) => {
     try {
-        const { query } = req.query;
-
-        if (!query) {
-            return res.status(400).json({
-                erro: "Informe uma receita para pesquisar"
-            });
-        }
+        const { query = "pizza" } = req.query;
 
         const queryEmIngles = await traduzir(query, "pt", "en");
 
@@ -33,17 +33,16 @@ const getReceitas = async (req, res) => {
                 params: {
                     apiKey: process.env.API_KEY,
                     query: queryEmIngles,
-                    number: 10
+                    number: 12
                 }
             }
         );
 
         const resultadosTraduzidos = await Promise.all(
-            resposta.data.results.map(async (receita) => {
-                const tituloEmPortugues = await traduzir(receita.title, "en", "pt");
+            resposta.data.results.map(async receita => {
                 return {
                     ...receita,
-                    title: tituloEmPortugues
+                    title: await traduzir(receita.title, "en", "pt")
                 };
             })
         );
@@ -52,15 +51,77 @@ const getReceitas = async (req, res) => {
             ...resposta.data,
             results: resultadosTraduzidos
         });
-
     } catch (error) {
-        console.error(error);
+        console.error(error.response?.data || error.message);
+
         res.status(500).json({
             error: "Erro ao buscar receitas"
         });
     }
 };
 
+const getDetalhesReceita = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const resposta = await axios.get(
+            `https://api.spoonacular.com/recipes/${id}/information`,
+            {
+                params: {
+                    apiKey: process.env.API_KEY
+                }
+            }
+        );
+
+        const receita = resposta.data;
+
+        const titulo = await traduzir(
+            receita.title,
+            "en",
+            "pt"
+        );
+
+        const ingredientes = await Promise.all(
+            receita.extendedIngredients.map(async ingrediente => {
+                return {
+                    ...ingrediente,
+                    original: await traduzir(
+                        ingrediente.original,
+                        "en",
+                        "pt"
+                    )
+                };
+            })
+        );
+
+        let instrucoes = receita.instructions;
+
+        if (instrucoes) {
+            instrucoes = await traduzir(
+                instrucoes,
+                "en",
+                "pt"
+            );
+        } else {
+            instrucoes = "Modo de preparo não disponível.";
+        }
+
+        res.json({
+            ...receita,
+            title: titulo,
+            extendedIngredients: ingredientes,
+            instructions: instrucoes
+        });
+    } catch (error) {
+        console.error(error.response?.data || error.message);
+
+        res.status(500).json({
+            error: "Erro ao buscar detalhes da receita"
+        });
+    }
+};
+
 module.exports = {
-    getReceitas
+    getReceitas,
+    getDetalhesReceita
 };
