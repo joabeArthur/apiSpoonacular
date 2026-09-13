@@ -1,0 +1,187 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+header {
+    background-color: #ff6b35;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+header h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 18px;
+}
+
+main {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.pesquisa {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.pesquisa input {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+.pesquisa input:focus {
+    border-color: #ff6b35;
+}
+
+.pesquisa button {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ff6b35;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.pesquisa button:hover {
+    background-color: #e85a2a;
+}
+
+.receitas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.card-conteudo {
+    padding: 20px;
+}
+
+.card-conteudo h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.card-conteudo p {
+    color: #777;
+}
+
+.detalhes {
+    display: none;
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.detalhes > img {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 20px auto;
+}
+
+.detalhes h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.informacoes {
+    max-width: 800px;
+    margin: auto;
+}
+
+.informacoes h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #ff6b35;
+}
+
+.informacoes ul {
+    padding-left: 25px;
+}
+
+.informacoes li {
+    margin-bottom: 8px;
+}
+
+#modoPreparo {
+    line-height: 1.8;
+}
+
+.voltar {
+    border: none;
+    background-color: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.voltar:hover {
+    background-color: #555;
+}
+
+@media (max-width: 600px) {
+    .pesquisa {
+        flex-direction: column;
+    }
+
+    .pesquisa button {
+        width: 100%;
+    }
+
+    header h1 {
+        font-size: 30px;
+    }
+
+    .detalhes {
+        padding: 20px;
+    }
+
+    .detalhes > img {
+        height: 250px;
+    }
+}
