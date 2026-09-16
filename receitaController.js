@@ -4,9 +4,7 @@ const traduzir = async (texto, de = "en", para = "pt") => {
     try {
         if (!texto) return "";
 
-        const url = "https://api.mymemory.translated.net/get?q=" +
-            encodeURIComponent(texto) +
-            "&langpair=" + de + "|" + para;
+        const url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(texto) + "&langpair=" + de + "|" + para;
 
         const resposta = await axios.get(url);
 
@@ -23,7 +21,7 @@ const traduzir = async (texto, de = "en", para = "pt") => {
 
 const getReceitas = async (req, res) => {
     try {
-        const { query = "pizza" } = req.query;
+        const { query } = req.query;
 
         const queryEmIngles = await traduzir(query, "pt", "en");
 
@@ -33,7 +31,7 @@ const getReceitas = async (req, res) => {
                 params: {
                     apiKey: process.env.API_KEY,
                     query: queryEmIngles,
-                    number: 12
+                    number: 10
                 }
             }
         );
@@ -75,21 +73,13 @@ const getDetalhesReceita = async (req, res) => {
 
         const receita = resposta.data;
 
-        const titulo = await traduzir(
-            receita.title,
-            "en",
-            "pt"
-        );
+        const titulo = await traduzir(receita.title, "en", "pt");
 
         const ingredientes = await Promise.all(
             receita.extendedIngredients.map(async ingrediente => {
                 return {
                     ...ingrediente,
-                    original: await traduzir(
-                        ingrediente.original,
-                        "en",
-                        "pt"
-                    )
+                    original: await traduzir(ingrediente.original, "en", "pt")
                 };
             })
         );
@@ -97,11 +87,7 @@ const getDetalhesReceita = async (req, res) => {
         let instrucoes = receita.instructions;
 
         if (instrucoes) {
-            instrucoes = await traduzir(
-                instrucoes,
-                "en",
-                "pt"
-            );
+            instrucoes = await traduzir(instrucoes, "en", "pt");
         } else {
             instrucoes = "Modo de preparo não disponível.";
         }
