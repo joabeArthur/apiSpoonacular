@@ -47,14 +47,14 @@
         const detalhes = document.getElementById("detalhes");
         const botaoVoltar = document.getElementById("botaoVoltar");
 
-        async function buscarReceitas(pesquisa = "pizza") {
+        async function buscarReceitas(pesquisa) {
             mensagem.textContent = "Carregando receitas...";
             listaReceitas.innerHTML = "";
             detalhes.style.display = "none";
             listaReceitas.style.display = "grid";
 
             try {
-                const resposta = await fetch(`/receitas?query=${encodeURIComponent(pesquisa)}&number=12`);
+                const resposta = await fetch(`/receitas?query=${encodeURIComponent(pesquisa)}&number=10`);
 
                 if (!resposta.ok) {
                     throw new Error("Erro ao buscar receitas");
@@ -148,7 +148,7 @@
             const pesquisa = campoPesquisa.value.trim();
 
             if (pesquisa === "") {
-                buscarReceitas("pizza");
+                buscarReceitas("");
             } else {
                 buscarReceitas(pesquisa);
             }
